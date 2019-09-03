@@ -43,17 +43,16 @@ namespace MazeGame
             updateGame();
         }
 
-        protected override void OnFormClosing(FormClosingEventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs CloseWindow)
         {
-            base.OnFormClosing(e);
+            base.OnFormClosing(CloseWindow);
 
-            if (e.CloseReason == CloseReason.WindowsShutDown) return;
+            if (CloseWindow.CloseReason == CloseReason.WindowsShutDown) return;
 
-            // Confirm user wants to close
-            switch (MessageBox.Show(this, "Are you sure you want to close?", "Closing", MessageBoxButtons.YesNo))
+            switch (MessageBox.Show(this, "Do you want to exit maze game?", "Exiting Application", MessageBoxButtons.YesNo))
             {
                 case DialogResult.No:
-                    e.Cancel = true;
+                    CloseWindow.Cancel = true;
                     break;
                 default:
                     break;
