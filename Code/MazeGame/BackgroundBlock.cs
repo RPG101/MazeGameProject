@@ -31,6 +31,14 @@ namespace MazeGame
             }
         }
 
+        public virtual bool isPassage
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public virtual uint Pointvalue
         {
             get

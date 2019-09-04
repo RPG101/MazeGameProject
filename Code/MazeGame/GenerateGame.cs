@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MazeGame
@@ -35,17 +37,20 @@ namespace MazeGame
         private const int CurrentHeight = 30;
         private IBlock[,] GameRegions;
         private PictureBox MazeDisplayBox;
-        private Room Room = new Room();
         public Movement PlayerMovement { set { Player1.PlayerDirection = value; } }
+        static Random RandomNumber = new Random();
+        public int Room = RandomNumber.Next(0, 11);
+        public List<int> passagePoint = new List<int>();
         public PlayerBlock Player01;
         public Player Player1;
         public Player Updatedplayer;
+
         public bool GameWin { get; private set; } = false;
         public bool PassageEntered { get; private set; } = false;
 
         public int[,] LoadMap(string lInput)
         {
-            int[,] MapLoadArray = new int[9, 9];
+            int[,] MapLoadArray = new int[17, 14];
 
             string textFile = lInput;
             if (File.Exists(textFile))
@@ -71,7 +76,7 @@ namespace MazeGame
 
         public void CreateMap()
         {
-            int[,] LoadedMapArray = LoadMap(Room.RandomRoom());
+            int[,] LoadedMapArray = LoadMap(RoomSelect(Room));
 
             for (int CurrentX = 0; CurrentX < LoadedMapArray.GetLength(0); CurrentX++)
             {
@@ -90,8 +95,22 @@ namespace MazeGame
                     if (LoadedMapArray[CurrentX, CurrentY] == 2)
                     {
                         GameRegions[CurrentX, CurrentY] = new PassageBlock(CurrentX, CurrentY, CurrentWidth, CurrentHeight);
-                        PassageBlock.CurrentX = CurrentX;
-                        PassageBlock.CurrentY = CurrentY;
+                        foreach (IBlock p in GameRegions)
+                        {
+                            if(p == null)
+                            {
+                                break;
+                            } else
+                            if (p.isPassage == true && p != null)
+                            {
+                                PassageBlock.Dimentions = new[]
+                                {
+                                     new PassageBlock.Point { X = p.BlockXvalue, Y = p.BlockYvalue }
+                                };
+                               
+                            }
+                        }
+                        
                     }
                     if (LoadedMapArray[CurrentX, CurrentY] == 3)
                     {
@@ -108,19 +127,20 @@ namespace MazeGame
         {
             this.MazeDisplayBox = GridGen;
 
-            int GridpointX = 9;
-            int GridpointY = 9;
+            int GridpointX = 17;
+            int GridpointY = 14;
 
             GameRegions = new IBlock[GridpointX, GridpointY];
 
-            Random RandLocation = new Random();
-            Player1.x = RandLocation.Next(1, 6); 
-            Player1.y = RandLocation.Next(1, 6); 
+            int RandomLocation;
+
+            RandomLocation = RandomNumber.Next(GameRegions.GetLength(0));
+
+            Player1.x = RandomLocation;
+            Player1.y = RandomLocation;
             PlayerBlock.CurrentX = Player1.x;
             PlayerBlock.CurrentY = Player1.y;
-
-            Room.LoadRooms();
-
+            
         }
 
         public void Rendermap()
@@ -134,7 +154,7 @@ namespace MazeGame
 
             foreach (IBlock Map in GameRegions)
             {
-                Map.RenderBlock(MapGraphic);
+                 Map.RenderBlock(MapGraphic);
             }
             MazeDisplayBox.Image = MapImage;
             MazeDisplayBox.Refresh();
@@ -142,12 +162,49 @@ namespace MazeGame
 
         public void RenderPlayer(PlayerBlock lCurrentPlayer)
         {
+
+
             Graphics PlayerGraphic = MazeDisplayBox.CreateGraphics();
             PlayerGraphic.InterpolationMode = InterpolationMode.Low;
             PlayerGraphic.CompositingMode = CompositingMode.SourceOver;
             PlayerGraphic.CompositingQuality = CompositingQuality.HighSpeed;
             SolidBrush fill = new SolidBrush(Color.Blue);
             PlayerGraphic.FillRectangle(fill, new Rectangle(PlayerBlock.CurrentX * CurrentWidth, PlayerBlock.CurrentY * CurrentHeight, CurrentWidth, CurrentHeight));
+        }
+
+        public string RoomSelect(int lRoom)
+        {
+
+
+            switch (lRoom)
+            {
+                case 0:
+                    return @"..\..\..\Levels\Level1.txt";
+                case 1:
+                    return @"..\..\..\Levels\Level1-Room1.txt";
+                case 2:
+                    return @"..\..\..\Levels\Level1-Room2.txt";
+                case 3:
+                    return @"..\..\..\Levels\Level1-Room3.txt";
+                case 4:
+                    return @"..\..\..\Levels\Level1-Room4.txt";
+                case 5:
+                    return @"..\..\..\Levels\Level1-Room5.txt";
+                case 6:
+                    return @"..\..\..\Levels\Level1-Room6.txt";
+                case 7:
+                    return @"..\..\..\Levels\Level1-Room7.txt";
+                case 8:
+                    return @"..\..\..\Levels\Level1-Room8.txt";
+                case 9:
+                    return @"..\..\..\Levels\Level1-Room9.txt";
+                case 10:
+                    return @"..\..\..\Levels\Level1-Room10.txt";
+                case 11:
+                    return @"..\..\..\Levels\Level1-Room11.txt";
+                default:
+                    return @"..\..\..\Levels\Level1-Complete.txt";
+            }
         }
 
         public Player UpdateMove(Player lplayer)
@@ -187,7 +244,10 @@ namespace MazeGame
             Rendermap();
             UpdateMove(Player1);
             RenderPlayer(Player01);
-            PassageEntered = PlayerBlock.CurrentX == PassageBlock.CurrentX && PlayerBlock.CurrentY == PassageBlock.CurrentY;
+            for(int i =0; i < PassageBlock.Dimentions.Length; i++)
+            {
+                    PassageEntered = PlayerBlock.CurrentX == PassageBlock.Dimentions[i].X && PlayerBlock.CurrentY == PassageBlock.Dimentions[i].Y;
+            }
             GameWin = PlayerBlock.CurrentX == ExitBlock.CurrentX && PlayerBlock.CurrentY == ExitBlock.CurrentY;
         }
     }

@@ -21,6 +21,7 @@ namespace MazeGame
 
         uint Pointvalue { get; }
 
+        bool isPassage { get; }
 
         void RenderBlock(Graphics lGraphics);
 

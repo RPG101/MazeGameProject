@@ -42,7 +42,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(25, 18);
+            this.label1.Location = new System.Drawing.Point(210, 20);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(70, 13);
             this.label1.TabIndex = 0;
@@ -51,7 +51,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(206, 18);
+            this.label2.Location = new System.Drawing.Point(430, 20);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(73, 13);
             this.label2.TabIndex = 1;
@@ -60,7 +60,7 @@
             // WealthBox
             // 
             this.WealthBox.Enabled = false;
-            this.WealthBox.Location = new System.Drawing.Point(284, 15);
+            this.WealthBox.Location = new System.Drawing.Point(509, 17);
             this.WealthBox.Name = "WealthBox";
             this.WealthBox.ReadOnly = true;
             this.WealthBox.Size = new System.Drawing.Size(100, 20);
@@ -69,7 +69,7 @@
             // LevelBox
             // 
             this.LevelBox.Enabled = false;
-            this.LevelBox.Location = new System.Drawing.Point(100, 15);
+            this.LevelBox.Location = new System.Drawing.Point(286, 17);
             this.LevelBox.Name = "LevelBox";
             this.LevelBox.ReadOnly = true;
             this.LevelBox.Size = new System.Drawing.Size(100, 20);
@@ -78,7 +78,7 @@
             // NewGameBtn
             // 
             this.NewGameBtn.Enabled = false;
-            this.NewGameBtn.Location = new System.Drawing.Point(10, 53);
+            this.NewGameBtn.Location = new System.Drawing.Point(25, 105);
             this.NewGameBtn.Name = "NewGameBtn";
             this.NewGameBtn.Size = new System.Drawing.Size(99, 50);
             this.NewGameBtn.TabIndex = 4;
@@ -89,7 +89,7 @@
             // NextLevelBtn
             // 
             this.NextLevelBtn.Enabled = false;
-            this.NextLevelBtn.Location = new System.Drawing.Point(10, 110);
+            this.NextLevelBtn.Location = new System.Drawing.Point(25, 179);
             this.NextLevelBtn.Name = "NextLevelBtn";
             this.NextLevelBtn.Size = new System.Drawing.Size(99, 50);
             this.NextLevelBtn.TabIndex = 5;
@@ -100,7 +100,7 @@
             // 
             this.Skills.Enabled = false;
             this.Skills.FormattingEnabled = true;
-            this.Skills.Location = new System.Drawing.Point(10, 167);
+            this.Skills.Location = new System.Drawing.Point(25, 294);
             this.Skills.Name = "Skills";
             this.Skills.Size = new System.Drawing.Size(99, 108);
             this.Skills.TabIndex = 6;
@@ -108,9 +108,9 @@
             // 
             // MazeDisplayBox
             // 
-            this.MazeDisplayBox.Location = new System.Drawing.Point(122, 53);
+            this.MazeDisplayBox.Location = new System.Drawing.Point(130, 43);
             this.MazeDisplayBox.Name = "MazeDisplayBox";
-            this.MazeDisplayBox.Size = new System.Drawing.Size(375, 241);
+            this.MazeDisplayBox.Size = new System.Drawing.Size(519, 391);
             this.MazeDisplayBox.TabIndex = 1;
             this.MazeDisplayBox.TabStop = false;
             // 
@@ -118,7 +118,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(402, 304);
+            this.ClientSize = new System.Drawing.Size(661, 467);
             this.Controls.Add(this.MazeDisplayBox);
             this.Controls.Add(this.Skills);
             this.Controls.Add(this.NextLevelBtn);

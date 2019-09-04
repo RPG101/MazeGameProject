@@ -9,14 +9,3 @@ C:\Users\rory.gallie\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.exe
 C:\Users\rory.gallie\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.pdb
 C:\Users\rory.gallie\Desktop\MazeProject\Code\MazeGame\bin\Debug\MazeGame.pdb
 C:\Users\rory.gallie\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.csprojAssemblyReference.cache
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\bin\Debug\MazeGame.exe.config
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\bin\Debug\MazeGame.exe
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\bin\Debug\MazeGame.pdb
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.csprojAssemblyReference.cache
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.GameForm.resources
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.Menu.resources
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.Properties.Resources.resources
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.csproj.GenerateResource.cache
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.csproj.CoreCompileInputs.cache
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.exe
-C:\Users\Rory2\Desktop\MazeProject\Code\MazeGame\obj\Debug\MazeGame.pdb

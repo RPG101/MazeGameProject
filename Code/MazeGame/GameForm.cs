@@ -43,16 +43,16 @@ namespace MazeGame
             updateGame();
         }
 
-        protected override void OnFormClosing(FormClosingEventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs CloseWindow)
         {
-            base.OnFormClosing(e);
+            base.OnFormClosing(CloseWindow);
 
-            if (e.CloseReason == CloseReason.WindowsShutDown) return;
+            if (CloseWindow.CloseReason == CloseReason.WindowsShutDown) return;
 
-            switch (MessageBox.Show(this, "Thanks for Playing, Closing application!", "Closing", MessageBoxButtons.YesNo))
+            switch (MessageBox.Show(this, "Do you want to exit maze game?", "Exiting Application", MessageBoxButtons.YesNo))
             {
                 case DialogResult.No:
-                    e.Cancel = true;
+                    CloseWindow.Cancel = true;
                     break;
                 default:
                     break;
@@ -77,6 +77,7 @@ namespace MazeGame
             }
             if (GameMap.PassageEntered == true)
             {
+                GameMap.Room++;
                 GameMap.CreateMap();
                 GameMap.UpdateGame();
             }
