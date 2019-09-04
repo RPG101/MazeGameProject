@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 
 namespace MazeGame
 {
+    // wall block that inherits base class background block
     internal class WallBlock : BackgroundBlock
     {
-
+        //wall block constuctor.
         public WallBlock(int CurrentX, int CurrentY, int CurrentWidth, int CurrentHeight) : base(CurrentX, CurrentY, CurrentWidth, CurrentHeight)
         {
 
         }
 
-
+        //sets wallblock to be a solid block
         public override bool SolidBlock
         {
             get
@@ -24,6 +25,7 @@ namespace MazeGame
             }
         }
 
+        //renders wallblock as a black square.
         public override void RenderBlock(Graphics lGraphics)
         {
             SolidBrush fill = new SolidBrush(Color.Black);

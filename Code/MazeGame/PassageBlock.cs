@@ -15,22 +15,8 @@ namespace MazeGame
 
         }
 
-
-        public class Point
-        {
-            public int X { get; set; }
-            public int Y { get; set; }
-        }
-
-        public static Point[] Dimentions { get; set; }
-
-        public override bool isPassage
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public static int CurrentX { get; set; }
+        public static int CurrentY { get; set; }
 
         public override bool SolidBlock
         {

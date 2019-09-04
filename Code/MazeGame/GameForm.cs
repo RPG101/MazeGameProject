@@ -12,15 +12,19 @@ namespace MazeGame
 {
     public partial class GameForm : Form
     {
+        //creates a new game map object from the GenerateGame class.
         private GenerateGame GameMap;
 
         public GameForm()
         {
+            //default windows forms initialization.
             InitializeComponent();
+            // enable key preview and keydown for handle's in key presses.
             this.KeyPreview = true;
             this.KeyDown += Gameform_KeyDown;
         }
 
+        //key press function, if a key is pressed update the current movement value.
         private void Gameform_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -40,25 +44,29 @@ namespace MazeGame
                 default:
                     break;
             }
+            //call to update the game once movement has occured.
             updateGame();
         }
 
-        protected override void OnFormClosing(FormClosingEventArgs CloseWindow)
+        // exits the application if the user hits the window X button.
+        protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            base.OnFormClosing(CloseWindow);
+            base.OnFormClosing(e);
 
-            if (CloseWindow.CloseReason == CloseReason.WindowsShutDown) return;
+            if (e.CloseReason == CloseReason.WindowsShutDown) return;
 
-            switch (MessageBox.Show(this, "Do you want to exit maze game?", "Exiting Application", MessageBoxButtons.YesNo))
+            switch (MessageBox.Show(this, "Thanks for Playing, Closing application!", "Closing", MessageBoxButtons.YesNo))
             {
                 case DialogResult.No:
-                    CloseWindow.Cancel = true;
+                    e.Cancel = true;
                     break;
                 default:
+                    Application.Exit();
                     break;
             }
         }
 
+        //sets the game objects and map to load when the form is being loaded.
         private void GameForm_Load(object sender, EventArgs e)
         {
             GameMap = new GenerateGame(MazeDisplayBox);
@@ -66,6 +74,7 @@ namespace MazeGame
             updateGame();
         }
 
+        //updates the game calling the update function to re-render the map and player upon movement or other conditions such as threat destroyed or coin collected.
         private void updateGame()
         {
             GameMap.UpdateGame();
@@ -74,12 +83,6 @@ namespace MazeGame
                 MessageBox.Show("You found the exit! congratulations!" + "\n" + "You got a x / x Wealth" + "\n" + "Restarting Game!");
                 
 
-            }
-            if (GameMap.PassageEntered == true)
-            {
-                GameMap.Room++;
-                GameMap.CreateMap();
-                GameMap.UpdateGame();
             }
 
         }

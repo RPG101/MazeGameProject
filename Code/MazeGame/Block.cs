@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace MazeGame
 {
+    /* interface to define and initialize the base class of Backgroundblock for inheritance. This will store information on
+     the block height, width, x and y value and also if the block is a solid block (player Cannot move on a solid block)
+     and the value for wealth. Also contains the Render block function. */
+
     internal interface IBlock
     {
         int Blockwidth { get; }
@@ -21,7 +25,6 @@ namespace MazeGame
 
         uint Pointvalue { get; }
 
-        bool isPassage { get; }
 
         void RenderBlock(Graphics lGraphics);
 

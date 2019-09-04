@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace MazeGame
 {
     internal class GenerateGame
     {
+        // enum for player movement to set each direction.
         public enum Movement
         {
             None,
@@ -19,6 +19,7 @@ namespace MazeGame
             RIGHT
         }
 
+        // A struct to store the player object information such as x, y values and the current movement value
         public struct Player
         {
             public int x;
@@ -26,6 +27,7 @@ namespace MazeGame
             public Movement PlayerDirection;
         }
 
+        // A struct to store the Threats information, its x and y values and its current movement value
         public struct Threat
         {
             public int x;
@@ -33,85 +35,105 @@ namespace MazeGame
             public Movement ThreatDirection;
         }
 
+        public struct Passages
+        {
+            public int[,] CurrentRoom;
+            public string NextRoom;
+            public Passage.PassageDirection RoomLink;
+            public int x;
+            public int y;
+            public bool PlayerEntered;
+        }
+
+
+
+        // data for each block default WxH
         private const int CurrentWidth = 30;
         private const int CurrentHeight = 30;
+        // creates a block array to store each block for the picture box locaiton.
         private IBlock[,] GameRegions;
+        //creates a picturebox to add graphics to the display, this will be updated into the main form.
         private PictureBox MazeDisplayBox;
+        //creates a new room object to allow access to functions for random rooms and loading of rooms.
+        private Passages[] PassagesInfo = new Passages[9];
+        //player movement to set current direction based on key pressed.
         public Movement PlayerMovement { set { Player1.PlayerDirection = value; } }
-        static Random RandomNumber = new Random();
-        public int Room = RandomNumber.Next(0, 11);
-        public List<int> passagePoint = new List<int>();
-        public PlayerBlock Player01;
+        // creates a player object to store current x and y values + movement.
         public Player Player1;
+        // creates a new player object to store the updated x and y values when movement occurs. 
         public Player Updatedplayer;
-
+        //boolean to set the game win condition.
         public bool GameWin { get; private set; } = false;
-        public bool PassageEntered { get; private set; } = false;
 
         public int[,] LoadMap(string lInput)
         {
-            int[,] MapLoadArray = new int[17, 14];
+            // creates a 9x9 2d array to store map x and y values (should always be 9x9)
+            int[,] MapLoadArray = new int[9, 9];
 
+            // takes the string from input.
             string textFile = lInput;
+            // checks if the file exists.
             if (File.Exists(textFile))
             {
+                // creates a string to store all text from file.
                 string lines = File.ReadAllText(textFile);
 
-                int i = 0, j = 0;
+                // creates storage for each x and y value
+                int x = 0, y = 0;
 
+                // loops over each line in the file
                 foreach (var row in lines.Split('\n'))
                 {
-                    j = 0;
+                    // sets the y value as 0 for a start point each loop
+                    y = 0;
+                    // takes the col and rows in the file and splits on each space
                     foreach (var col in row.Trim().Split(' '))
                     {
-                        MapLoadArray[i, j] = int.Parse(col.Trim());
-                        j++;
+                        // from each x and y value parse and store into array
+                        MapLoadArray[x, y] = int.Parse(col.Trim());
+                        // update y value
+                        y++;
                     }
-                    i++;
+                    // update x value
+                    x++;
                 }
             }
+            //store the values for the map into the game region to be replaced by a block.
             GameRegions = new IBlock[MapLoadArray.GetLength(0), MapLoadArray.GetLength(1)];
             return MapLoadArray;
         }
 
         public void CreateMap()
         {
-            int[,] LoadedMapArray = LoadMap(RoomSelect(Room));
+            int PassageArrayNum = 0;
+            //loads a random room from the room dictonary
+            int[,] LoadedMapArray = Room.RandomRoom();
 
+            //loops over the x and y values loaded in the map
             for (int CurrentX = 0; CurrentX < LoadedMapArray.GetLength(0); CurrentX++)
             {
                 for (int CurrentY = 0; CurrentY < LoadedMapArray.GetLength(1); CurrentY++)
                 {
+                    // if the file contains a 0 set this as a background block
                     if (LoadedMapArray[CurrentX, CurrentY] == 0)
                     {
                         GameRegions[CurrentX, CurrentY] = new BackgroundBlock(CurrentX, CurrentY, CurrentWidth, CurrentHeight);
                     }
-
+                    // if the file contains a 1 set this as a wall block.
                     if (LoadedMapArray[CurrentX, CurrentY] == 1)
                     {
                         GameRegions[CurrentX, CurrentY] = new WallBlock(CurrentX, CurrentY, CurrentWidth, CurrentHeight);
                     }
-
+                    //if the file contains a 2 set this as a passage block
                     if (LoadedMapArray[CurrentX, CurrentY] == 2)
                     {
                         GameRegions[CurrentX, CurrentY] = new PassageBlock(CurrentX, CurrentY, CurrentWidth, CurrentHeight);
-                        foreach (IBlock p in GameRegions)
-                        {
-                            if(p == null)
-                            {
-                                break;
-                            } else
-                            if (p.isPassage == true && p != null)
-                            {
-                                PassageBlock.Dimentions = new[]
-                                {
-                                     new PassageBlock.Point { X = p.BlockXvalue, Y = p.BlockYvalue }
-                                };
-                               
-                            }
-                        }
-                        
+                        PassagesInfo[PassageArrayNum].x = CurrentX;
+                        PassagesInfo[PassageArrayNum].y = CurrentY;
+                        PassagesInfo[PassageArrayNum].CurrentRoom = Room.CurrentRoom;
+                        PassageArrayNum++;
                     }
+                    //if the file contains a 3 set this as an exit block.
                     if (LoadedMapArray[CurrentX, CurrentY] == 3)
                     {
                         GameRegions[CurrentX, CurrentY] = new ExitBlock(CurrentX, CurrentY, CurrentWidth, CurrentHeight);
@@ -120,97 +142,66 @@ namespace MazeGame
                     }
                 }
             }
+            // renders the map once all data has been loaded and set to a specific block
             Rendermap();
         }
 
         public GenerateGame(PictureBox GridGen)
         {
+            //start up constructor to create the maze and its grid size for a room.
             this.MazeDisplayBox = GridGen;
 
-            int GridpointX = 17;
-            int GridpointY = 14;
+            int GridpointX = 9;
+            int GridpointY = 9;
 
+            //Creates all grid points as a block
             GameRegions = new IBlock[GridpointX, GridpointY];
 
-            int RandomLocation;
+            //sets a random location for the player
+            Random RandLocation = new Random();
+            Player1.x = RandLocation.Next(1, 6);
+            Player1.y = RandLocation.Next(1, 6);
 
-            RandomLocation = RandomNumber.Next(GameRegions.GetLength(0));
+            //loads all room configuration files.
+            Room.LoadRooms();
+            //Passage.LoadPassageConfig();
 
-            Player1.x = RandomLocation;
-            Player1.y = RandomLocation;
-            PlayerBlock.CurrentX = Player1.x;
-            PlayerBlock.CurrentY = Player1.y;
-            
         }
 
         public void Rendermap()
         {
+            //sets the map as the size of the picture box
             Bitmap MapImage = new Bitmap(MazeDisplayBox.Width, MazeDisplayBox.Height);
 
+            //creates a graphic handle from the picture box
             Graphics MapGraphic = Graphics.FromImage(MapImage);
 
+            //sets the quality of image and interpolation
             MapGraphic.InterpolationMode = InterpolationMode.Low;
             MapGraphic.CompositingQuality = CompositingQuality.HighSpeed;
 
+            //creates all blocks that are stored in the game regions, this can be the Background block(just border lines), wallblock and passages/exit.
             foreach (IBlock Map in GameRegions)
             {
-                 Map.RenderBlock(MapGraphic);
+                Map.RenderBlock(MapGraphic);
             }
-            MazeDisplayBox.Image = MapImage;
-            MazeDisplayBox.Refresh();
-        }
 
-        public void RenderPlayer(PlayerBlock lCurrentPlayer)
-        {
-
-
-            Graphics PlayerGraphic = MazeDisplayBox.CreateGraphics();
-            PlayerGraphic.InterpolationMode = InterpolationMode.Low;
-            PlayerGraphic.CompositingMode = CompositingMode.SourceOver;
-            PlayerGraphic.CompositingQuality = CompositingQuality.HighSpeed;
+            //renders the player to the graphic.
             SolidBrush fill = new SolidBrush(Color.Blue);
-            PlayerGraphic.FillRectangle(fill, new Rectangle(PlayerBlock.CurrentX * CurrentWidth, PlayerBlock.CurrentY * CurrentHeight, CurrentWidth, CurrentHeight));
-        }
+            MapGraphic.FillRectangle(fill, new Rectangle(Player1.x * CurrentWidth, Player1.y * CurrentHeight, CurrentWidth, CurrentHeight));
 
-        public string RoomSelect(int lRoom)
-        {
-
-
-            switch (lRoom)
-            {
-                case 0:
-                    return @"..\..\..\Levels\Level1.txt";
-                case 1:
-                    return @"..\..\..\Levels\Level1-Room1.txt";
-                case 2:
-                    return @"..\..\..\Levels\Level1-Room2.txt";
-                case 3:
-                    return @"..\..\..\Levels\Level1-Room3.txt";
-                case 4:
-                    return @"..\..\..\Levels\Level1-Room4.txt";
-                case 5:
-                    return @"..\..\..\Levels\Level1-Room5.txt";
-                case 6:
-                    return @"..\..\..\Levels\Level1-Room6.txt";
-                case 7:
-                    return @"..\..\..\Levels\Level1-Room7.txt";
-                case 8:
-                    return @"..\..\..\Levels\Level1-Room8.txt";
-                case 9:
-                    return @"..\..\..\Levels\Level1-Room9.txt";
-                case 10:
-                    return @"..\..\..\Levels\Level1-Room10.txt";
-                case 11:
-                    return @"..\..\..\Levels\Level1-Room11.txt";
-                default:
-                    return @"..\..\..\Levels\Level1-Complete.txt";
-            }
+            //sets the current display box in the form to the picturebox declared above.
+            MazeDisplayBox.Image = MapImage;
+            //refreshes the data for the map.
+            MazeDisplayBox.Refresh();
         }
 
         public Player UpdateMove(Player lplayer)
         {
+            //Holds current player location in a new vairable
             Updatedplayer = lplayer;
 
+            //updates the new player information
             switch (Updatedplayer.PlayerDirection)
             {
                 case Movement.UP:
@@ -232,23 +223,244 @@ namespace MazeGame
                 default:
                     break;
             }
+            //provents movement through walls, this is done if the updated player location is a wall then just return the current player without changes
             if (GameRegions[Updatedplayer.x, Updatedplayer.y].SolidBlock == true) return lplayer;
 
-            PlayerBlock.CurrentX = Updatedplayer.x;
-            PlayerBlock.CurrentY = Updatedplayer.y;
+            // if the location is not a wall from previous statment then the player location is updated correctly
             return Player1 = Updatedplayer;
         }
 
         public void UpdateGame()
         {
-            Rendermap();
+            //calls the code to update a player's move
             UpdateMove(Player1);
-            RenderPlayer(Player01);
-            for(int i =0; i < PassageBlock.Dimentions.Length; i++)
-            {
-                    PassageEntered = PlayerBlock.CurrentX == PassageBlock.Dimentions[i].X && PlayerBlock.CurrentY == PassageBlock.Dimentions[i].Y;
-            }
-            GameWin = PlayerBlock.CurrentX == ExitBlock.CurrentX && PlayerBlock.CurrentY == ExitBlock.CurrentY;
+            //renders the map if changes have occured e.g. threat defeated, coin obtained or player moved. all need to be re-displayed on the screen
+            LinkRooms();
+            Rendermap();
+            //sets the win condition for the exit block.
+            
+            GameWin = Player1.x == ExitBlock.CurrentX && Player1.y == ExitBlock.CurrentY;
+            
         }
+
+        public void LinkRooms()
+        {
+            if (Room.CurrentRoom == Room.RoomDict[0])
+            {
+                bool EnteredNorth = Player1.x == PassagesInfo[1].x && Player1.y == PassagesInfo[1].y;
+                bool EnteredWest = Player1.x == PassagesInfo[0].x && Player1.y == PassagesInfo[0].y;
+
+                if (EnteredNorth == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[1];
+                    CreateMap();
+                    Player1.x = 4;
+                    Player1.y = 6;
+
+                }
+
+                if (EnteredWest == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[5];
+                    CreateMap();
+                    Player1.x = 7;
+                    Player1.y = 3;
+                }
+
+            }
+
+            if (Room.CurrentRoom == Room.RoomDict[1])
+            {
+                bool EnteredNorth = Player1.x == PassagesInfo[1].x && Player1.y == PassagesInfo[1].y;
+                bool EnteredWest = Player1.x == PassagesInfo[0].x && Player1.y == PassagesInfo[0].y;
+                bool EnteredSouth = Player1.x == PassagesInfo[2].x && Player1.y == PassagesInfo[2].y;
+
+                if (EnteredSouth == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[0];
+                    CreateMap();
+                    Player1.x = 4;
+                    Player1.y = 1;
+                }
+
+                if(EnteredWest == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[3];
+                    CreateMap();
+                    Player1.x = 7;
+                    Player1.y = 3;
+                }
+
+                if(EnteredNorth == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[2];
+                    CreateMap();
+                    Player1.x = 4;
+                    Player1.y = 6;
+                }
+
+            }
+
+            if (Room.CurrentRoom == Room.RoomDict[2])
+            {
+                bool EnteredSouth = Player1.x == PassagesInfo[1].x && Player1.y == PassagesInfo[1].y;
+                bool EnteredWest = Player1.x == PassagesInfo[0].x && Player1.y == PassagesInfo[0].y;
+
+                if(EnteredSouth == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[1];
+                    CreateMap();
+                    Player1.x = 4;
+                    Player1.y = 1;
+
+                }
+
+                if(EnteredWest == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[7];
+                    CreateMap();
+                    Player1.x = 7;
+                    Player1.y = 3;
+                }
+
+            }
+
+
+            if (Room.CurrentRoom == Room.RoomDict[3])
+            {
+                bool EnteredSouth = Player1.x == PassagesInfo[1].x && Player1.y == PassagesInfo[1].y;
+                bool EnteredWest = Player1.x == PassagesInfo[0].x && Player1.y == PassagesInfo[0].y;
+                bool EnteredEast = Player1.x == PassagesInfo[2].x && Player1.y == PassagesInfo[2].y;
+
+                if(EnteredSouth == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[5];
+                    CreateMap();
+                    Player1.x = 4;
+                    Player1.y = 1;
+
+                }
+
+                if(EnteredEast == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[1];
+                    CreateMap();
+                    Player1.x = 1;
+                    Player1.y = 3;
+
+                }
+
+                if(EnteredWest == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[4];
+                    CreateMap();
+                    Player1.x = 7;
+                    Player1.y = 3;
+                }
+
+
+            }
+
+            if (Room.CurrentRoom == Room.RoomDict[4])
+            {
+                bool EnteredEast = Player1.x == PassagesInfo[1].x && Player1.y == PassagesInfo[1].y;
+                bool EnteredNorth = Player1.x == PassagesInfo[0].x && Player1.y == PassagesInfo[0].y;
+
+                if (EnteredEast == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[3];
+                    CreateMap();
+                    Player1.x = 1;
+                    Player1.y = 3;
+
+                }
+
+                if(EnteredNorth == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[6];
+                    CreateMap();
+                    Player1.x = 4;
+                    Player1.y = 6;
+                }
+
+            }
+
+            if (Room.CurrentRoom == Room.RoomDict[5])
+            {
+                bool EnteredEast = Player1.x == PassagesInfo[1].x && Player1.y == PassagesInfo[1].y;
+                bool EnteredNorth = Player1.x == PassagesInfo[0].x && Player1.y == PassagesInfo[0].y;
+
+                if (EnteredNorth == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[3];
+                    CreateMap();
+                    Player1.x = 4;
+                    Player1.y = 6;
+
+                }
+
+                if (EnteredEast == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[0];
+                    CreateMap();
+                    Player1.x = 1;
+                    Player1.y = 3;
+                }
+            }
+
+            if(Room.CurrentRoom == Room.RoomDict[6])
+            {
+                bool EnteredSouth = Player1.x == PassagesInfo[0].x && Player1.y == PassagesInfo[0].y;
+                bool EnteredEast = Player1.x == PassagesInfo[1].x && Player1.y == PassagesInfo[1].y;
+
+                if(EnteredSouth == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[4];
+                    CreateMap();
+                    Player1.x = 4;
+                    Player1.y = 1;
+                }
+
+                if(EnteredEast == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[7];
+                    CreateMap();
+                    Player1.x = 1;
+                    Player1.y = 3;
+                }
+
+
+            }
+
+            if(Room.CurrentRoom == Room.RoomDict[7])
+            {
+                bool EnteredEast = Player1.x == PassagesInfo[1].x && Player1.y == PassagesInfo[1].y;
+                bool EnteredWest = Player1.x == PassagesInfo[0].x && Player1.y == PassagesInfo[0].y;
+
+                if(EnteredWest == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[6];
+                    CreateMap();
+                    Player1.x = 7;
+                    Player1.y = 3;
+                }
+
+                if(EnteredEast == true)
+                {
+                    Room.CurrentRoom = Room.RoomDict[2];
+                    CreateMap();
+                    Player1.x = 1;
+                    Player1.y = 3;
+                }
+
+            }
+
+
+
+
+        }
+
+
+
     }
 }
