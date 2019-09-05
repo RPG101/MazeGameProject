@@ -21,7 +21,9 @@ namespace MazeGame
 
         int BlockYvalue { get; }
 
-        bool SolidBlock { get; }
+        bool SolidBlock { get; set; }
+
+        bool IsPassage { get; }
 
         uint Pointvalue { get; }
 

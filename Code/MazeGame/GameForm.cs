@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.Build.BuildEngine;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,6 +24,7 @@ namespace MazeGame
             // enable key preview and keydown for handle's in key presses.
             this.KeyPreview = true;
             this.KeyDown += Gameform_KeyDown;
+
         }
 
         //key press function, if a key is pressed update the current movement value.
@@ -30,16 +33,28 @@ namespace MazeGame
             switch (e.KeyCode)
             {
                 case Keys.Up:
+                    GameMap.PlayerAttack = GenerateGame.PlayerAction.NoAction;
                     GameMap.PlayerMovement = GenerateGame.Movement.UP;
                     break;
                 case Keys.Down:
+                    GameMap.PlayerAttack = GenerateGame.PlayerAction.NoAction;
                     GameMap.PlayerMovement = GenerateGame.Movement.DOWN;
                     break;
                 case Keys.Left:
+                    GameMap.PlayerAttack = GenerateGame.PlayerAction.NoAction;
                     GameMap.PlayerMovement = GenerateGame.Movement.LEFT;
                     break;
                 case Keys.Right:
+                    GameMap.PlayerAttack = GenerateGame.PlayerAction.NoAction;
                     GameMap.PlayerMovement = GenerateGame.Movement.RIGHT;
+                    break;
+                case Keys.Space:
+                    GameMap.PlayerAttack = GenerateGame.PlayerAction.club;
+                    GameMap.PlayerMovement = GenerateGame.Movement.None;
+                    break;
+                case Keys.C:
+                    GameMap.PlayerAttack = GenerateGame.PlayerAction.collect;
+                    GameMap.PlayerMovement = GenerateGame.Movement.None;
                     break;
                 default:
                     break;
@@ -78,18 +93,20 @@ namespace MazeGame
         private void updateGame()
         {
             GameMap.UpdateGame();
+            Healthbox.Text = GameMap.Player1.health.ToString();
             if (GameMap.GameWin == true)
             {
                 MessageBox.Show("You found the exit! congratulations!" + "\n" + "You got a x / x Wealth" + "\n" + "Restarting Game!");
-                
-
             }
+
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_MouseClick(object sender, EventArgs e)
         {
-
+            GameForm NewForm = new GameForm();
+            NewForm.Show();
+            this.Dispose(false);
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)

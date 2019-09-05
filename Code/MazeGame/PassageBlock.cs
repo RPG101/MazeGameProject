@@ -26,6 +26,14 @@ namespace MazeGame
             }
         }
 
+        public override bool IsPassage
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override void RenderBlock(Graphics lGraphics)
         {
             SolidBrush fill = new SolidBrush(Color.Teal);

@@ -31,6 +31,18 @@ namespace MazeGame
             {
                 return false;
             }
+            set
+            {
+
+            }
+        }
+
+        public virtual bool IsPassage
+        {
+            get
+            {
+                return false;
+            }
         }
 
         // value of the block in wealth.
