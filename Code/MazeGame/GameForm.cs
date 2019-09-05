@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -15,7 +16,8 @@ namespace MazeGame
     public partial class GameForm : Form
     {
         //creates a new game map object from the GenerateGame class.
-        private GenerateGame GameMap;
+        public GenerateGame GameMap;
+
 
         public GameForm()
         {
@@ -24,7 +26,7 @@ namespace MazeGame
             // enable key preview and keydown for handle's in key presses.
             this.KeyPreview = true;
             this.KeyDown += Gameform_KeyDown;
-
+            ControlsTxt.Text = "Move UP = Up Arrow" + '\n' + '\n' + "Move Down = Down Arrow" + '\n' + '\n' + "Move Left = Left Arrow" + '\n' + '\n' + "Move Right = Right arrow" + '\n' + '\n' + "Collect Coins = C (when ontop of coin)" + '\n' + '\n' + "Attack = Spacebar (when ontop of threat)" + '\n' + '\n' + "Threats will be red, Coints will be Copper, Silver or Gold";
         }
 
         //key press function, if a key is pressed update the current movement value.
@@ -76,7 +78,6 @@ namespace MazeGame
                     e.Cancel = true;
                     break;
                 default:
-                    Application.Exit();
                     break;
             }
         }
@@ -94,24 +95,33 @@ namespace MazeGame
         {
             GameMap.UpdateGame();
             Healthbox.Text = GameMap.Player1.health.ToString();
+            WealthBox.Text = GameMap.Player1.Wealth.ToString();
             if (GameMap.GameWin == true)
             {
-                MessageBox.Show("You found the exit! congratulations!" + "\n" + "You got a x / x Wealth" + "\n" + "Restarting Game!");
+             switch(  MessageBox.Show("You found the exit! congratulations!" + '\n' + "Your coin wealth was " + WealthBox.Text + " Your healthpoints where " + Healthbox.Text + '\n' + " Click OK to Restart", "Restarting", MessageBoxButtons.OK))
+                {
+                    case DialogResult.OK:
+                        NewGameBtn.PerformClick();
+                        break;
+                    default:
+                        break;
+
+                }
+                
             }
 
 
         }
 
+        //click for starting new game
         private void button1_MouseClick(object sender, EventArgs e)
         {
             GameForm NewForm = new GameForm();
             NewForm.Show();
+            GameMap.CreateMap();
             this.Dispose(false);
         }
 
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
 
-        }
     }
 }

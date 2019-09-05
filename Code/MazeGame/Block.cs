@@ -9,9 +9,10 @@ namespace MazeGame
 {
     /* interface to define and initialize the base class of Backgroundblock for inheritance. This will store information on
      the block height, width, x and y value and also if the block is a solid block (player Cannot move on a solid block)
-     and the value for wealth. Also contains the Render block function. */
+     and the value for wealth. Also contains the Render block function. This is used to define members dynamically for base class*/
 
-    internal interface IBlock
+
+    public interface IBlock
     {
         int Blockwidth { get; }
 
@@ -24,9 +25,6 @@ namespace MazeGame
         bool SolidBlock { get; set; }
 
         bool IsPassage { get; }
-
-        uint Pointvalue { get; }
-
 
         void RenderBlock(Graphics lGraphics);
 

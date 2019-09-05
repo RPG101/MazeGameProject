@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace MazeGame
 {
-    internal class GenerateGame
+    public class GenerateGame
     {
         // enum for player movement to set each direction.
         public enum Movement
@@ -18,7 +18,7 @@ namespace MazeGame
             LEFT,
             RIGHT
         }
-
+        //enum for a players actions.
         public enum PlayerAction
         {
             NoAction,
@@ -33,7 +33,7 @@ namespace MazeGame
             public int y;
             public int health;
             public int Wealth;
-            public PlayerAction PlayerAttack;
+            public PlayerAction playerAction;
             public Movement PlayerDirection;
         }
 
@@ -43,9 +43,9 @@ namespace MazeGame
             public int x;
             public int y;
             public bool IsDestroyed;
-            public Movement ThreatDirection;
         }
 
+        //struct to store the coin data
         public struct Coin
         {
             public int x;
@@ -56,33 +56,30 @@ namespace MazeGame
             public bool BeenCollected;
         }
 
+        /* initializes the objects and vairables needed in other functions */
+        public string[] RoomPaths = Directory.GetFiles(@"..\..\..\Levels\");
         public Dictionary<int, Room> RoomDict = new Dictionary<int, Room>();
-        // data for each block default WxH
         private const int CurrentWidth = 30;
-        private const int CurrentHeight = 30;
-        // creates a block array to store each block for the picture box locaiton.
-        private IBlock[,] GameRegions;
-        //creates a picturebox to add graphics to the display, this will be updated into the main form.
+        private const int CurrentHeight = 30; 
+        public IBlock[,] GameRegions;
         private PictureBox MazeDisplayBox;
-        private readonly Room[] Rooms = new Room[8];
+        public readonly Room[] Rooms = new Room[8];
+        Random RandomSpawn = new Random(6);
         private int CurrentRoom = 0;
-        //player movement to set current direction based on key pressed.
         public Movement PlayerMovement { set { Player1.PlayerDirection = value; } }
-        public PlayerAction PlayerAttack { set { Player1.PlayerAttack = value; } }
-        // creates a player object to store current x and y values + movement.
+        public PlayerAction PlayerAttack { set { Player1.playerAction = value; } }
         public Player Player1;
         public Threat Enemy;
         public Player UpdatedPlayerAction;
         public Coin Coins;
-        // creates a new player object to store the updated x and y values when movement occurs. 
         public Player Updatedplayer;
-        //boolean to set the game win condition.
-        public bool GameWin { get; private set; } = false;
+        public bool GameWin { get; set; } = false;
 
+
+        //loads all rooms at once and stores room map data into room object then stores all rooms into a dictionary.
         public void LoadRooms()
         {
             int MapNumber = 0;
-            string[] RoomPaths = Directory.GetFiles(@"..\..\..\Levels\");
             // iterate over each room string 
             foreach (string room in RoomPaths)
             {
@@ -123,11 +120,17 @@ namespace MazeGame
             }
         }
 
+        /*this function sets all the blocks in the map from the 
+        values in the text file then calls the function to render each block, 
+        this also will randomly set the coin and threat location.
+        This also does some validation on the map file for each value in the map file.
+        if the map files are incorrect the application will break*/
         public void CreateMap()
         {
-            Random RandNumber = new Random();
-            Coins.Value = RandNumber.Next(1, 100);
+            UpdateLocationsinMap();
             UpdateCoinData();
+            
+
 
             //loads a random room from the room dictonary
             int[,] LoadedMapArray = Rooms[CurrentRoom].Map;
@@ -140,29 +143,8 @@ namespace MazeGame
                     // if the file contains a 0 set this as a background block
                     if (LoadedMapArray[CurrentX, CurrentY] == 0)
                     {
+                        // random locations for each coin and threat if they do not conflict with each other.
                         GameRegions[CurrentX, CurrentY] = new BackgroundBlock(CurrentX, CurrentY, CurrentWidth, CurrentHeight);
-                        Random RandLocation = new Random();
-                        Enemy.x = RandLocation.Next(1, 6);
-                        Enemy.y = RandLocation.Next(1, 6);
-                        Coins.x = RandLocation.Next(1, 6);
-                        Coins.y = RandLocation.Next(1, 6);
-                        if(Coins.x == Player1.x && Coins.y == Player1.y)
-                        {
-                            
-                            Coins.x = RandLocation.Next(1, 6);
-                            Coins.y = RandLocation.Next(1, 6);
-                        }
-                        if (Coins.x == Enemy.x && Coins.y == Enemy.y)
-                        {
-                            Coins.x = RandLocation.Next(1, 6);
-                            Coins.y = RandLocation.Next(1, 6);
-                        }
-                    
-                        if (Enemy.x == Player1.x && Enemy.y == Player1.y)
-                        {
-                            Enemy.x = RandLocation.Next(1, 6);
-                            Enemy.y = RandLocation.Next(1, 6);
-                        }
                     }
                     // if the file contains a 1 set this as a wall block.
                     if (LoadedMapArray[CurrentX, CurrentY] == 1)
@@ -178,8 +160,6 @@ namespace MazeGame
                     if (LoadedMapArray[CurrentX, CurrentY] == 6)
                     {
                         GameRegions[CurrentX, CurrentY] = new ExitBlock(CurrentX, CurrentY, CurrentWidth, CurrentHeight);
-                        ExitBlock.CurrentX = CurrentX;
-                        ExitBlock.CurrentY = CurrentY;
                     }
                 }
             }
@@ -189,7 +169,7 @@ namespace MazeGame
 
         public GenerateGame(PictureBox GridGen)
         {
-            //start up constructor to create the maze and its grid size for a room.
+            //start up, to create the maze and its grid size for a room.
             this.MazeDisplayBox = GridGen;
 
             int GridpointX = 9;
@@ -199,14 +179,17 @@ namespace MazeGame
             GameRegions = new IBlock[GridpointX, GridpointY];
 
             //sets a random location for the player
-            Random RandNumber = new Random();
-            Player1.x = RandNumber.Next(1, 6);
-            Player1.y = RandNumber.Next(1, 6);
+            Player1.x = RandomSpawn.Next(1, 6);
+            Player1.y = RandomSpawn.Next(1, 6);
+            Enemy.x = RandomSpawn.Next(1, 6);
+            Enemy.y = RandomSpawn.Next(1, 6);
+            Coins.x = 6;
+            Coins.y = 5;
             Player1.health = 100;
             //loads all room configuration files.
             LoadRooms();
+            //sets how the rooms link together
             SetRoomLinks();
-            //Passage.LoadPassageConfig();
         }
 
         public void Rendermap()
@@ -231,12 +214,14 @@ namespace MazeGame
             SolidBrush fill = new SolidBrush(Color.Blue);
             MapGraphic.FillRectangle(fill, new Rectangle(Player1.x * CurrentWidth, Player1.y * CurrentHeight, CurrentWidth, CurrentHeight));
 
+            //if no threats do not render a threat.
             if(Rooms[CurrentRoom].NoThreats == false)
             {
                 SolidBrush EnemyColor = new SolidBrush(Color.Red);
                 MapGraphic.FillRectangle(EnemyColor, new Rectangle(Enemy.x * CurrentWidth, Enemy.y * CurrentHeight, CurrentWidth, CurrentHeight));
             }
 
+            //if no coins do not render a coin.
             if(Rooms[CurrentRoom].NoCoins == false)
             {
 
@@ -286,7 +271,7 @@ namespace MazeGame
 
         public void CoinMessageAndRemove(int Coin, string CoinType)
         {
-            
+         // takes the coin value and type and displayes a message box when the user collects the coin.   
             MessageBox.Show("You found a " + CoinType + " Coin Worth " + Coin + " Points!", "closing", MessageBoxButtons.OK);
             Coins.BeenCollected = true;
             Rooms[CurrentRoom].NoCoins = true;
@@ -294,6 +279,31 @@ namespace MazeGame
             Coins.y = 0;
         }
 
+        public void UpdateLocationsinMap()
+        {
+            Enemy.x = RandomSpawn.Next(1, 6);
+            Enemy.y = RandomSpawn.Next(1, 6);
+            Coins.x = 6;
+            Coins.y = 5;
+
+            if (Rooms[CurrentRoom].NoThreats == false && Rooms[CurrentRoom].NoCoins == false)
+            {
+                Coins.Value = RandomSpawn.Next(1, 100);
+            }
+
+            if (Enemy.x == Coins.x && Enemy.y == Coins.y)
+            {
+                Enemy.x = RandomSpawn.Next(1, 6);
+                Enemy.y = RandomSpawn.Next(1, 6);
+            }
+            if(Enemy.x == Player1.x && Enemy.y == Player1.y)
+            {
+                Enemy.x = RandomSpawn.Next(1, 6);
+                Enemy.y = RandomSpawn.Next(1, 6);
+            }
+
+
+        }
 
         public Player UpdateAction(Player lplayer)
         {
@@ -301,7 +311,7 @@ namespace MazeGame
             
             UpdatedPlayerAction = lplayer;
 
-            switch (UpdatedPlayerAction.PlayerAttack)
+            switch (UpdatedPlayerAction.playerAction)
             {
                 case PlayerAction.club:
                     if(Enemy.x == Player1.x && Enemy.y == Player1.y)
@@ -319,7 +329,7 @@ namespace MazeGame
                     if (Coins.x == Player1.x && Coins.y == Player1.y)
                     {
                         UpdatedPlayerAction.Wealth += Coins.Value;
-                         CoinMessageAndRemove(Coins.Value, Coins.CoinType);
+                        CoinMessageAndRemove(Coins.Value, Coins.CoinType);
                         
                     }
                     break;
@@ -335,6 +345,7 @@ namespace MazeGame
 
         public void UpdateCoinData()
         {
+            //sets the values for coin type and color based on the value of the coin.
             if (Coins.Value >= 1 && Coins.Value <= 49)
             {
                 Coins.CoinType = "Copper";
@@ -357,23 +368,42 @@ namespace MazeGame
             //calls the code to update a player's move
             UpdateMove(Player1);
             UpdateAction(Player1);
+            UpdateExit();
             //renders the map if changes have occured e.g. threat defeated, coin obtained or player moved. all need to be re-displayed on the screen
             PassageLocate();
             Rendermap();
             //sets the win condition for the exit block.
+            
+            
 
-            GameWin = Player1.x == ExitBlock.CurrentX && Player1.y == ExitBlock.CurrentY;
+        }
 
+        public void UpdateExit()
+        {
+            // updates the exit room to not allow a player to enter exit if threats exist in the room.
+            if (Rooms[7].NoThreats == true)
+            {
+                GameWin = Player1.x == ExitBlock.X && Player1.y == ExitBlock.Y;
+            }
+            if (Rooms[CurrentRoom] == Rooms[7] && Rooms[7].NoThreats == false && Player1.x == ExitBlock.X && Player1.y == ExitBlock.Y)
+            {
+                GameRegions[ExitBlock.X, ExitBlock.Y].SolidBlock = true;
+                MessageBox.Show("You Cannot go that way, All Enemy's must be defeated", "closing", MessageBoxButtons.OK);
+                Player1.y += 1;
+            }
         }
 
         public Room LinkRooms(int X, int Y)
         {
+            // links all rooms together and does not let the player exit a room if a threat exists.
             Room UpdatedRoom = Rooms[CurrentRoom];
 
             if (UpdatedRoom.Map[X,Y] == 2 && UpdatedRoom.NoThreats == true)
             {
                 GameRegions[X, Y].SolidBlock = false;
+                RoomDict[CurrentRoom].HasEntered = true;
                 UpdatedRoom = RoomDict[UpdatedRoom.North];
+                RoomDict[UpdatedRoom.North].HasEntered = true;
                 Player1.x = 4;
                 Player1.y = 6;
             }
@@ -388,7 +418,9 @@ namespace MazeGame
             if(UpdatedRoom.Map[X, Y] == 3 && UpdatedRoom.NoThreats == true)
             {
                 GameRegions[X, Y].SolidBlock = false;
+                RoomDict[CurrentRoom].HasEntered = true;
                 UpdatedRoom = RoomDict[UpdatedRoom.West];
+                RoomDict[UpdatedRoom.West].HasEntered = true;
                 Player1.x = 7;
                 Player1.y = 3;
             }
@@ -402,7 +434,9 @@ namespace MazeGame
             if (UpdatedRoom.Map[X, Y] == 4 && UpdatedRoom.NoThreats == true)
             {
                 GameRegions[X, Y].SolidBlock = false;
+                RoomDict[CurrentRoom].HasEntered = true;
                 UpdatedRoom = RoomDict[UpdatedRoom.south];
+                RoomDict[UpdatedRoom.south].HasEntered = true;
                 Player1.x = 4;
                 Player1.y = 1;
             }
@@ -416,7 +450,9 @@ namespace MazeGame
             if (UpdatedRoom.Map[X, Y] == 5 && UpdatedRoom.NoThreats == true)
             {
                 GameRegions[X, Y].SolidBlock = false;
+                RoomDict[CurrentRoom].HasEntered = true;
                 UpdatedRoom = RoomDict[UpdatedRoom.East];
+                RoomDict[UpdatedRoom.East].HasEntered = true;
                 Player1.x = 1;
                 Player1.y = 3;
             }
@@ -426,7 +462,6 @@ namespace MazeGame
                 MessageBox.Show("You Cannot go that way, All Enemy's must be defeated", "closing", MessageBoxButtons.OK);
                 Player1.x -= 1;
             }
-
             return UpdatedRoom;
         }
 
@@ -435,6 +470,7 @@ namespace MazeGame
 
         public void SetRoomLinks()
         {
+            //sets the links for each room
             Rooms[0].North = 1;
             Rooms[0].West = 5;
             Rooms[1].North = 2;
@@ -455,12 +491,14 @@ namespace MazeGame
             Rooms[7].East = 2;
         }
 
+        /* checks the players location in accordance to the grid to see if a player is attempting to enter a passage
+           if the player room location is correct the room will be updated.*/
         public void PassageLocate()
         {
             if (GameRegions[Player1.x, Player1.y].IsPassage == true)
             {
                 Room UpdateCurrent = Rooms[CurrentRoom];
-                UpdateCurrent= LinkRooms(Player1.x, Player1.y);
+                UpdateCurrent = LinkRooms(Player1.x, Player1.y);
 
                 if(Rooms[CurrentRoom] == UpdateCurrent)
                 {

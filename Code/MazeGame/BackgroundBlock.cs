@@ -15,7 +15,7 @@ namespace MazeGame
         public int Blockwidth { get; protected set; }
         public int Blockheight { get; protected set; }
 
-        //constructor to set the block values.
+        //constructor to set the backgroundblock values.
         public BackgroundBlock(int CurrentX, int CurrentY, int CurrentWidth, int CurrentHeight)
         {
             this.BlockXvalue = CurrentX;
@@ -24,7 +24,7 @@ namespace MazeGame
             this.Blockheight = CurrentHeight;
         }
 
-        //bool to say if the block is solic
+        //bool to say if the block is solid (player cannot pass a solid block)
         public virtual bool SolidBlock
         {
             get
@@ -37,20 +37,12 @@ namespace MazeGame
             }
         }
 
+        //check if this is a passage to a different room
         public virtual bool IsPassage
         {
             get
             {
                 return false;
-            }
-        }
-
-        // value of the block in wealth.
-        public virtual uint Pointvalue
-        {
-            get
-            {
-                return 0;
             }
         }
 

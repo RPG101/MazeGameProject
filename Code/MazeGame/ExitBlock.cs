@@ -9,23 +9,30 @@ namespace MazeGame
 {
     internal class ExitBlock : BackgroundBlock
     {
-
+        //constructor for exit block
         public ExitBlock(int CurrentX, int CurrentY, int CurrentWidth, int CurrentHeight) : base(CurrentX, CurrentY, CurrentWidth, CurrentHeight)
         {
-
+            X = CurrentX;
+            Y = CurrentY;
         }
+        //return the x and y values of the exit block
+        public static int X { get; set; }
+        public static int Y { get; set; }
 
-        public static int CurrentX { get; set; }
-        public static int CurrentY { get; set; }
-
+        //set the exit block to not be solid
         public override bool SolidBlock
         {
             get
             {
                 return false;
             }
+            set
+            {
+
+            }
         }
 
+        //renders block to screen, as a green rectangle
         public override void RenderBlock(Graphics lGraphics)
         {
             SolidBrush fill = new SolidBrush(Color.Green);

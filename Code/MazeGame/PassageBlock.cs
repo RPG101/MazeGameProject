@@ -9,23 +9,26 @@ namespace MazeGame
 {
     internal class PassageBlock : BackgroundBlock
     {
-
+        //constructor for passage block
         public PassageBlock(int CurrentX, int CurrentY, int CurrentWidth, int CurrentHeight) : base(CurrentX, CurrentY, CurrentWidth, CurrentHeight)
         {
 
         }
 
-        public static int CurrentX { get; set; }
-        public static int CurrentY { get; set; }
-
+        //sets the block to be solid or not.
         public override bool SolidBlock
         {
             get
             {
                 return false;
             }
+            set
+            {
+
+            }
         }
 
+        // checks this block is a passage to a different room.
         public override bool IsPassage
         {
             get
@@ -34,6 +37,7 @@ namespace MazeGame
             }
         }
 
+        // renders the passageblock as a teal rectangle
         public override void RenderBlock(Graphics lGraphics)
         {
             SolidBrush fill = new SolidBrush(Color.Teal);
