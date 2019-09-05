@@ -381,11 +381,11 @@ namespace MazeGame
         public void UpdateExit()
         {
             // updates the exit room to not allow a player to enter exit if threats exist in the room.
-            if (Rooms[7].NoThreats == true)
+            if (Rooms[CurrentRoom].Map == Rooms[7].Map && Rooms[7].NoThreats == true)
             {
                 GameWin = Player1.x == ExitBlock.X && Player1.y == ExitBlock.Y;
             }
-            if (Rooms[CurrentRoom] == Rooms[7] && Rooms[7].NoThreats == false && Player1.x == ExitBlock.X && Player1.y == ExitBlock.Y)
+            if (Rooms[CurrentRoom].Map == Rooms[7].Map && Rooms[7].NoThreats == false && Player1.x == ExitBlock.X && Player1.y == ExitBlock.Y)
             {
                 GameRegions[ExitBlock.X, ExitBlock.Y].SolidBlock = true;
                 MessageBox.Show("You Cannot go that way, All Enemy's must be defeated", "closing", MessageBoxButtons.OK);
