@@ -63,9 +63,11 @@ namespace MazeGame
         private const int CurrentHeight = 30; 
         public IBlock[,] GameRegions;
         private PictureBox MazeDisplayBox;
+        bool Firstload;
+        public int[,] LoadedMapArray;
         public readonly Room[] Rooms = new Room[8];
-        Random RandomSpawn = new Random(6);
-        private int CurrentRoom = 0;
+        public static Random RandomSpawn = new Random(6);
+        private int CurrentRoom = RandomSpawn.Next(0, 6);
         public Movement PlayerMovement { set { Player1.PlayerDirection = value; } }
         public PlayerAction PlayerAttack { set { Player1.playerAction = value; } }
         public Player Player1;
@@ -129,11 +131,8 @@ namespace MazeGame
         {
             UpdateLocationsinMap();
             UpdateCoinData();
-            
 
-
-            //loads a random room from the room dictonary
-            int[,] LoadedMapArray = Rooms[CurrentRoom].Map;
+            LoadedMapArray = Rooms[CurrentRoom].Map;
 
             //loops over the x and y values loaded in the map
             for (int CurrentX = 0; CurrentX < LoadedMapArray.GetLength(0); CurrentX++)

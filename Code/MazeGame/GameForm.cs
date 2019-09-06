@@ -77,6 +77,9 @@ namespace MazeGame
                 case DialogResult.No:
                     e.Cancel = true;
                     break;
+                case DialogResult.Yes:
+                    Environment.Exit(0);
+                    break;
                 default:
                     break;
             }
