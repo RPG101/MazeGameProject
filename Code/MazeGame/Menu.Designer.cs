@@ -38,7 +38,7 @@
             // 
             this.StartBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StartBtn.Location = new System.Drawing.Point(65, 146);
-            this.StartBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.StartBtn.Margin = new System.Windows.Forms.Padding(2);
             this.StartBtn.Name = "StartBtn";
             this.StartBtn.Size = new System.Drawing.Size(116, 50);
             this.StartBtn.TabIndex = 1;
@@ -50,7 +50,7 @@
             // 
             this.ExitBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ExitBtn.Location = new System.Drawing.Point(65, 227);
-            this.ExitBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ExitBtn.Margin = new System.Windows.Forms.Padding(2);
             this.ExitBtn.Name = "ExitBtn";
             this.ExitBtn.Size = new System.Drawing.Size(116, 55);
             this.ExitBtn.TabIndex = 2;
@@ -88,6 +88,7 @@
             this.Controls.Add(this.GameName);
             this.Controls.Add(this.ExitBtn);
             this.Controls.Add(this.StartBtn);
+            this.MaximizeBox = false;
             this.Name = "Menu";
             this.Text = "Menu";
             this.ResumeLayout(false);

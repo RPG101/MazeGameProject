@@ -59,6 +59,8 @@ namespace MazeGame
                     GameMap.PlayerMovement = GenerateGame.Movement.None;
                     break;
                 default:
+                    GameMap.PlayerMovement = GenerateGame.Movement.None;
+                    GameMap.PlayerAttack = GenerateGame.PlayerAction.NoAction;
                     break;
             }
             //call to update the game once movement has occured.

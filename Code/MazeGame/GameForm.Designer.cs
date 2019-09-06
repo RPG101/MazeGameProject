@@ -129,6 +129,7 @@
             this.Controls.Add(this.WealthBox);
             this.Controls.Add(this.label2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "GameForm";
             this.Text = "GameForm";
             this.Load += new System.EventHandler(this.GameForm_Load);

@@ -52,6 +52,7 @@ namespace MazeGame
             public int y;
             public int Value;
             public SolidBrush CoinColor;
+            public int CurrentRoom;
             public string CoinType;
             public bool BeenCollected;
         }
@@ -63,17 +64,16 @@ namespace MazeGame
         private const int CurrentHeight = 30; 
         public IBlock[,] GameRegions;
         private PictureBox MazeDisplayBox;
-        bool Firstload;
         public int[,] LoadedMapArray;
         public readonly Room[] Rooms = new Room[8];
-        public static Random RandomSpawn = new Random(6);
-        private int CurrentRoom = RandomSpawn.Next(0, 6);
+        public static Random RandomSpawn = new Random();
+        public int CurrentRoom = RandomSpawn.Next(0, 6);
         public Movement PlayerMovement { set { Player1.PlayerDirection = value; } }
         public PlayerAction PlayerAttack { set { Player1.playerAction = value; } }
         public Player Player1;
         public Threat Enemy;
         public Player UpdatedPlayerAction;
-        public Coin Coins;
+        public Coin[] Coins = new Coin[8];
         public Player Updatedplayer;
         public bool GameWin { get; set; } = false;
 
@@ -130,7 +130,6 @@ namespace MazeGame
         public void CreateMap()
         {
             UpdateLocationsinMap();
-            UpdateCoinData();
 
             LoadedMapArray = Rooms[CurrentRoom].Map;
 
@@ -182,9 +181,33 @@ namespace MazeGame
             Player1.y = RandomSpawn.Next(1, 6);
             Enemy.x = RandomSpawn.Next(1, 6);
             Enemy.y = RandomSpawn.Next(1, 6);
-            Coins.x = 6;
-            Coins.y = 5;
             Player1.health = 100;
+
+            for (int i = 0; i < Rooms.Length; i++)
+            {
+                Coins[i].Value = RandomSpawn.Next(1, 100);
+                Coins[i].x = 6;
+                Coins[i].y = 5;
+            
+
+                if (Coins[i].Value >= 1 && Coins[i].Value <= 49)
+                {
+                Coins[i].CoinType = "Copper";
+                Coins[i].CoinColor = new SolidBrush(Color.Brown);
+                }
+                if (Coins[i].Value >= 50 && Coins[i].Value <= 75)
+                {
+                Coins[i].CoinType = "Silver";
+                Coins[i].CoinColor = new SolidBrush(Color.Silver);
+                }
+                if (Coins[i].Value >= 76 && Coins[i].Value <= 100)
+                {
+                Coins[i].CoinType = "Gold";
+                Coins[i].CoinColor = new SolidBrush(Color.Gold);
+                Coins[i].CoinColor = new SolidBrush(Color.Gold);
+                }
+
+            }
             //loads all room configuration files.
             LoadRooms();
             //sets how the rooms link together
@@ -223,8 +246,7 @@ namespace MazeGame
             //if no coins do not render a coin.
             if(Rooms[CurrentRoom].NoCoins == false)
             {
-
-                MapGraphic.FillRectangle(Coins.CoinColor, new Rectangle(Coins.x * CurrentWidth, Coins.y * CurrentHeight, CurrentWidth, CurrentHeight));
+                    MapGraphic.FillRectangle(Coins[CurrentRoom].CoinColor, new Rectangle(Coins[CurrentRoom].x * CurrentWidth, Coins[CurrentRoom].y * CurrentHeight, CurrentWidth, CurrentHeight));
             } 
 
             //sets the current display box in the form to the picturebox declared above.
@@ -272,25 +294,20 @@ namespace MazeGame
         {
          // takes the coin value and type and displayes a message box when the user collects the coin.   
             MessageBox.Show("You found a " + CoinType + " Coin Worth " + Coin + " Points!", "closing", MessageBoxButtons.OK);
-            Coins.BeenCollected = true;
+            Coins[CurrentRoom].BeenCollected = true;
             Rooms[CurrentRoom].NoCoins = true;
-            Coins.x = 0;
-            Coins.y = 0;
+            Coins[CurrentRoom].x = 0;
+            Coins[CurrentRoom].y = 0;
         }
 
         public void UpdateLocationsinMap()
         {
             Enemy.x = RandomSpawn.Next(1, 6);
             Enemy.y = RandomSpawn.Next(1, 6);
-            Coins.x = 6;
-            Coins.y = 5;
+            Coins[CurrentRoom].x = 6;
+            Coins[CurrentRoom].y = 5;
 
-            if (Rooms[CurrentRoom].NoThreats == false && Rooms[CurrentRoom].NoCoins == false)
-            {
-                Coins.Value = RandomSpawn.Next(1, 100);
-            }
-
-            if (Enemy.x == Coins.x && Enemy.y == Coins.y)
+            if (Enemy.x == Coins[CurrentRoom].x && Enemy.y == Coins[CurrentRoom].y)
             {
                 Enemy.x = RandomSpawn.Next(1, 6);
                 Enemy.y = RandomSpawn.Next(1, 6);
@@ -325,10 +342,10 @@ namespace MazeGame
                     }
                     break;
                 case PlayerAction.collect:
-                    if (Coins.x == Player1.x && Coins.y == Player1.y)
+                    if (Coins[CurrentRoom].x == Player1.x && Coins[CurrentRoom].y == Player1.y)
                     {
-                        UpdatedPlayerAction.Wealth += Coins.Value;
-                        CoinMessageAndRemove(Coins.Value, Coins.CoinType);
+                        UpdatedPlayerAction.Wealth += Coins[CurrentRoom].Value;
+                        CoinMessageAndRemove(Coins[CurrentRoom].Value, Coins[CurrentRoom].CoinType);
                         
                     }
                     break;
@@ -342,25 +359,6 @@ namespace MazeGame
 
         }
 
-        public void UpdateCoinData()
-        {
-            //sets the values for coin type and color based on the value of the coin.
-            if (Coins.Value >= 1 && Coins.Value <= 49)
-            {
-                Coins.CoinType = "Copper";
-                Coins.CoinColor = new SolidBrush(Color.Brown);
-            }
-            if (Coins.Value >= 50 && Coins.Value <= 75)
-            {
-                Coins.CoinType = "Silver";
-                Coins.CoinColor = new SolidBrush(Color.Silver);
-            }
-            if (Coins.Value >= 76 && Coins.Value <= 100)
-            {
-                Coins.CoinType = "Gold";
-                Coins.CoinColor = new SolidBrush(Color.Gold);
-            }
-        }
 
         public void UpdateGame()
         {
@@ -380,11 +378,11 @@ namespace MazeGame
         public void UpdateExit()
         {
             // updates the exit room to not allow a player to enter exit if threats exist in the room.
-            if (Rooms[CurrentRoom].Map == Rooms[7].Map && Rooms[7].NoThreats == true)
+            if (Rooms[CurrentRoom].HasExit == true && Rooms[CurrentRoom].NoThreats == true)
             {
                 GameWin = Player1.x == ExitBlock.X && Player1.y == ExitBlock.Y;
             }
-            if (Rooms[CurrentRoom].Map == Rooms[7].Map && Rooms[7].NoThreats == false && Player1.x == ExitBlock.X && Player1.y == ExitBlock.Y)
+            if (Rooms[CurrentRoom].HasExit == true && Rooms[CurrentRoom].NoThreats == false && Player1.x == ExitBlock.X && Player1.y == ExitBlock.Y)
             {
                 GameRegions[ExitBlock.X, ExitBlock.Y].SolidBlock = true;
                 MessageBox.Show("You Cannot go that way, All Enemy's must be defeated", "closing", MessageBoxButtons.OK);
@@ -401,12 +399,14 @@ namespace MazeGame
             {
                 GameRegions[X, Y].SolidBlock = false;
                 RoomDict[CurrentRoom].HasEntered = true;
+                CurrentRoom = UpdatedRoom.North;
                 UpdatedRoom = RoomDict[UpdatedRoom.North];
                 RoomDict[UpdatedRoom.North].HasEntered = true;
                 Player1.x = 4;
                 Player1.y = 6;
+                return UpdatedRoom;
             }
-            if (Rooms[CurrentRoom].Map[X, Y] == 2 && Rooms[CurrentRoom].NoThreats == false)
+            if (UpdatedRoom.Map[X, Y] == 2 && UpdatedRoom.NoThreats == false)
             {
                 GameRegions[X, Y].SolidBlock = true;
                 MessageBox.Show("You Cannot go that way, All Enemy's must be defeated", "closing", MessageBoxButtons.OK);
@@ -418,12 +418,14 @@ namespace MazeGame
             {
                 GameRegions[X, Y].SolidBlock = false;
                 RoomDict[CurrentRoom].HasEntered = true;
+                CurrentRoom = UpdatedRoom.West;
                 UpdatedRoom = RoomDict[UpdatedRoom.West];
                 RoomDict[UpdatedRoom.West].HasEntered = true;
                 Player1.x = 7;
                 Player1.y = 3;
+                return UpdatedRoom;
             }
-            if (Rooms[CurrentRoom].Map[X, Y] == 3 && Rooms[CurrentRoom].NoThreats == false)
+            if (UpdatedRoom.Map[X, Y] == 3 && UpdatedRoom.NoThreats == false)
             {
                 GameRegions[X, Y].SolidBlock = true;
                 MessageBox.Show("You Cannot go that way, All Enemy's must be defeated", "closing", MessageBoxButtons.OK);
@@ -434,12 +436,14 @@ namespace MazeGame
             {
                 GameRegions[X, Y].SolidBlock = false;
                 RoomDict[CurrentRoom].HasEntered = true;
+                CurrentRoom = UpdatedRoom.south;
                 UpdatedRoom = RoomDict[UpdatedRoom.south];
                 RoomDict[UpdatedRoom.south].HasEntered = true;
                 Player1.x = 4;
                 Player1.y = 1;
+                return UpdatedRoom;
             }
-            if (Rooms[CurrentRoom].Map[X, Y] == 4 && Rooms[CurrentRoom].NoThreats == false)
+            if (UpdatedRoom.Map[X, Y] == 4 && Rooms[CurrentRoom].NoThreats == false)
             {
                 GameRegions[X, Y].SolidBlock = true;
                 MessageBox.Show("You Cannot go that way, All Enemy's must be defeated", "closing", MessageBoxButtons.OK);
@@ -450,12 +454,14 @@ namespace MazeGame
             {
                 GameRegions[X, Y].SolidBlock = false;
                 RoomDict[CurrentRoom].HasEntered = true;
+                CurrentRoom = UpdatedRoom.East;
                 UpdatedRoom = RoomDict[UpdatedRoom.East];
                 RoomDict[UpdatedRoom.East].HasEntered = true;
                 Player1.x = 1;
                 Player1.y = 3;
+                return UpdatedRoom;
             }
-            if (Rooms[CurrentRoom].Map[X, Y] == 5 && Rooms[CurrentRoom].NoThreats == false)
+            if (UpdatedRoom.Map[X, Y] == 5 && UpdatedRoom.NoThreats == false)
             {
                 GameRegions[X, Y].SolidBlock = true;
                 MessageBox.Show("You Cannot go that way, All Enemy's must be defeated", "closing", MessageBoxButtons.OK);
@@ -488,6 +494,7 @@ namespace MazeGame
             Rooms[6].East = 7;
             Rooms[7].West = 6;
             Rooms[7].East = 2;
+            Rooms[7].HasExit = true;
         }
 
         /* checks the players location in accordance to the grid to see if a player is attempting to enter a passage
@@ -499,12 +506,11 @@ namespace MazeGame
                 Room UpdateCurrent = Rooms[CurrentRoom];
                 UpdateCurrent = LinkRooms(Player1.x, Player1.y);
 
-                if(Rooms[CurrentRoom] == UpdateCurrent)
+                if(Rooms[CurrentRoom] != UpdateCurrent)
                 {
                     return;
                 } else
                 {
-                    Rooms[CurrentRoom] = UpdateCurrent;
                     CreateMap();
                 }
                

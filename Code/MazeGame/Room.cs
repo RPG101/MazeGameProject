@@ -20,6 +20,7 @@ namespace MazeGame
         public bool NoThreats;
         public bool NoCoins;
         public bool HasEntered;
+        public bool HasExit;
 
         //map data storage
         public int[,] Map;

@@ -128,7 +128,7 @@ namespace MazeGame
             //set known value of seed
             int TestValue = 59;
             //check value is correct
-            Assert.AreEqual(TestValue, GameForms.GameMap.Coins.Value);
+            Assert.AreEqual(TestValue, GameForms.GameMap.Coins[GameForms.GameMap.CurrentRoom]);
 
         }
         [Test]
