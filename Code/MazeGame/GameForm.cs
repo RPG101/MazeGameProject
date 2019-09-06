@@ -68,21 +68,19 @@ namespace MazeGame
         }
 
         // exits the application if the user hits the window X button.
-        protected override void OnFormClosing(FormClosingEventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs CloseEvent)
         {
-            base.OnFormClosing(e);
+            base.OnFormClosing(CloseEvent);
 
-            if (e.CloseReason == CloseReason.WindowsShutDown) return;
+            if (CloseEvent.CloseReason == CloseReason.WindowsShutDown) return;
 
-            switch (MessageBox.Show(this, "Thanks for Playing, Closing application!", "Closing", MessageBoxButtons.YesNo))
+            switch (MessageBox.Show(this, "Thanks for Playing!", "Closing", MessageBoxButtons.OK))
             {
-                case DialogResult.No:
-                    e.Cancel = true;
-                    break;
                 case DialogResult.Yes:
                     Environment.Exit(0);
                     break;
                 default:
+                    Environment.Exit(0);
                     break;
             }
         }
