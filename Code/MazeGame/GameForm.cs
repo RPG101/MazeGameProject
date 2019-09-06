@@ -26,7 +26,7 @@ namespace MazeGame
             // enable key preview and keydown for handle's in key presses.
             this.KeyPreview = true;
             this.KeyDown += Gameform_KeyDown;
-            ControlsTxt.Text = "Move UP = Up Arrow" + '\n' + '\n' + "Move Down = Down Arrow" + '\n' + '\n' + "Move Left = Left Arrow" + '\n' + '\n' + "Move Right = Right arrow" + '\n' + '\n' + "Collect Coins = C (when ontop of coin)" + '\n' + '\n' + "Attack = Spacebar (when ontop of threat)" + '\n' + '\n' + "Threats will be red, Coints will be Copper, Silver or Gold";
+            ControlsTxt.Text = "Move UP = Up Arrow" + '\n' + '\n' + "Move Down = Down Arrow" + '\n' + '\n' + "Move Left = Left Arrow" + '\n' + '\n' + "Move Right = Right arrow" + '\n' + '\n' + "Collect Coins = C (when ontop of coin)" + '\n' + '\n' + "Attack = Spacebar (when ontop of threat)" + '\n' + '\n' + "Threats will be red, Coints will be Copper, Silver or Gold" + '\n' + '\n' + "You are the blue square, a teal square will take you to a new room" + '\n' + '\n' + "Your goal is to get the most wealth!" ;
         }
 
         //key press function, if a key is pressed update the current movement value.
